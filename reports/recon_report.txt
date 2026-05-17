@@ -1,0 +1,15 @@
+RECON SAFE REPORT
+User: USER
+Host: ENVIRONMENT
+Kernel: 6.18.12+kali
+
+[NETWORK SUMMARY]
+Interfaces: 2 detected
+Actvie network interfaces hidden for safety
+
+[PORT SUMMARY]
+Listening services: 0
+Raw port data hidden (sanitized view only)
+
+[STATUS]
+System scan completed successfully
