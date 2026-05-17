@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>kali ui</title>
-<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?
 family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
@@ -12,7 +11,7 @@ body{
 margin:0;
 height:100vh;
 overflow:hidden;
-background:radial-gradient(circle at center,#020202,#000);
+background:radial-gradient(circle at center,#040404,#000);
 font-family:'JetBrains Mono', monospace;
 color:white;
 }
@@ -21,41 +20,49 @@ color:white;
 position:fixed;
 inset:0;
 background-image:
-linear-gradient(rgba(0,214,122,0.035) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0,214,122,0.035) 1px, transparent 1px);
+linear-gradient(rgba(0,180,255,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,180,255,0.03) 1px, transparent 1px);
 background-size:55px 55px;
 transform:perspective(600px) rotateX(65deg) scale(2);
 animation:gridMove 6s linear infinite;
-opacity:0.45;
+opacity:0.28;
 }
 @keyframes gridMove{
-from{transform:perspective(600px) rotateX(65deg) translateY(0) scale(2);}
-to{transform:perspective(600px) rotateX(65deg) translateY(55px) scale(2);}
+from{
+transform:perspective(600px) rotateX(65deg) translateY(0) scale(2);
+}
+to{
+transform:perspective(600px) rotateX(65deg) translateY(55px) scale(2);
+}
 }
 /* GLOW */
 .glow{
 position:fixed;
 width:700px;
 height:700px;
-background:rgba(0,214,122,0.08);
+background:rgba(0,180,255,0.08);
 filter:blur(140px);
 border-radius:50%;
 top:50%;
+
 left:50%;
 transform:translate(-50%,-50%);
 animation:pulse 4s ease-in-out infinite;
 }
 @keyframes pulse{
-0%,100%{transform:translate(-50%,-50%) scale(1);}
-
-50%{transform:translate(-50%,-50%) scale(1.15);}
+0%,100%{
+transform:translate(-50%,-50%) scale(1);
+}
+50%{
+transform:translate(-50%,-50%) scale(1.12);
+}
 }
 /* SCAN */
 .scan{
 position:fixed;
 width:100%;
-height:3px;
-background:rgba(0,214,122,0.14);
+height:2px;
+background:rgba(0,180,255,0.14);
 animation:scanMove 3s linear infinite;
 }
 @keyframes scanMove{
@@ -67,10 +74,10 @@ to{top:110%;}
 position:fixed;
 top:-100%;
 font-size:14px;
-color:rgba(0,214,122,0.20);
+color:rgba(0,180,255,0.18);
 white-space:nowrap;
 pointer-events:none;
-text-shadow:0 0 8px rgba(0,214,122,0.25);
+text-shadow:0 0 8px rgba(0,180,255,0.2);
 animation:fall linear infinite;
 }
 @keyframes fall{
@@ -86,9 +93,10 @@ transform:translate(-50%,-50%);
 width:88%;
 max-width:920px;
 padding:55px;
+
 border-radius:22px;
-background:rgba(0,0,0,0.55);
-border:1px solid rgba(0,214,122,0.10);
+background:rgba(0,0,0,0.52);
+border:1px solid rgba(255,255,255,0.06);
 backdrop-filter:blur(20px);
 box-shadow:0 0 60px rgba(0,0,0,0.6);
 }
@@ -96,80 +104,68 @@ box-shadow:0 0 60px rgba(0,0,0,0.6);
 .topbar{
 display:flex;
 justify-content:space-between;
-font-size:12px;
+font-size:11px;
 letter-spacing:3px;
-color:rgba(255,255,255,0.6);
-
+color:rgba(255,255,255,0.45);
 }
-.accent{color:#00d67a;}
+.accent{
+color:#00b4ff;
+}
 /* TITLE */
 h1{
 margin-top:35px;
-font-size:64px;
+font-size:68px;
+letter-spacing:3px;
 font-weight:600;
-letter-spacing:4px;
 }
 h1 span{
-color:#00d67a;
-text-shadow:0 0 25px rgba(0,214,122,0.35);
+color:#00b4ff;
+text-shadow:0 0 20px rgba(0,180,255,0.35);
 }
 /* TYPE TEXT */
 .type{
 margin-top:15px;
-font-size:14px;
-font-weight:300;
-color:rgba(0,214,122,0.65);
-letter-spacing:1.5px;
+font-size:13px;
+color:rgba(0,180,255,0.55);
+letter-spacing:2px;
 height:20px;
 }
 /* DESCRIPTION */
 p{
 max-width:650px;
-color:rgba(255,255,255,0.6);
-line-height:1.7;
+color:rgba(255,255,255,0.52);
+line-height:1.8;
+font-size:14px;
 }
 /* BUTTONS */
 .btns{
+
 margin-top:40px;
 }
 button{
 background:transparent;
-border:1px solid rgba(0,214,122,0.18);
-color:rgba(0,214,122,0.75);
+border:1px solid rgba(0,180,255,0.16);
+color:rgba(0,180,255,0.82);
 padding:12px 18px;
 margin-right:10px;
 border-radius:10px;
 cursor:pointer;
 transition:0.2s;
+font-family:'JetBrains Mono', monospace;
 }
 button:hover{
-background:rgba(0,214,122,0.08);
+background:rgba(0,180,255,0.06);
 transform:translateY(-3px);
-box-shadow:0 0 18px rgba(0,214,122,0.10);
+box-shadow:0 0 18px rgba(0,180,255,0.08);
 }
 /* SIGNATURE */
-
 .signature{
 position:fixed;
 bottom:18px;
 right:22px;
-font-size:14px;
+font-size:12px;
 letter-spacing:4px;
-color:rgba(0,214,122,0.25);
-}
-/* WATERMARK (KALI DRAGON) */
-.watermark{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:420px;
-height:420px;
-background:url('https://www.kali.org/images/kali-dragon-logo.svg') no-repeat center;
-background-size:contain;
-opacity:0.03;
-pointer-events:none;
-filter:blur(0.3px);
+color:rgba(0,180,255,0.22);
 }
 </style>
 </head>
@@ -177,46 +173,59 @@ filter:blur(0.3px);
 <div class="grid"></div>
 <div class="glow"></div>
 <div class="scan"></div>
-<div class="watermark"></div>
 <div id="codeLayer"></div>
 <div class="panel">
 <div class="topbar">
-<div class="accent">SESSION ACTIVE</div>
-<div>ENVIRONMENT READY</div>
+<div class="accent">KALI UI ACTIVE</div>
+<div>RECON ONLINE</div>
 </div>
 <h1>KALI <span>UI</span></h1>
 <div class="type" id="type"></div>
 <p>
-Security research environment focused on Linux systems, networking analysis,
-automation workflows, and penetration testing labs.
+Security research environment focused on Linux systems,
+network analysis, automation workflows,
+and controlled security operations.
+
 </p>
 <div class="btns">
-<button>OPERATIONS</button>
-<button>TERMINAL</button>
-<button>STATUS</button>
+<button onclick="window.location.href='operations.html'">
+OPERATIONS
+</button>
+<button>
+TERMINAL
+</button>
+<button>
+STATUS
+</button>
 </div>
-
 </div>
 <div class="signature">APEIRON</div>
 <script>
-const chars="01{}[]<>/\\=+-_*#$%@";
+const chars="01{}[]<>/\\\\=+-_*#$%@";
 const layer=document.getElementById("codeLayer");
 for(let i=0;i<90;i++){
 let d=document.createElement("div");
 d.className="code";
 d.style.left=Math.random()*100+"vw";
 d.style.animationDuration=(3+Math.random()*6)+"s";
-d.style.opacity=Math.random()*0.4;
-d.innerText=Array.from({length:100},()=>chars[Math.floor(Math.random()*chars.length)]).join("");
+d.style.opacity=Math.random()*0.35;
+d.innerText=Array.from(
+{length:100},
+()=>chars[Math.floor(Math.random()*chars.length)]
+).join("");
 layer.appendChild(d);
 }
 const type=document.getElementById("type");
-const text="INITIALIZING SYSTEM... LOADING MODULES... ACCESS GRANTED";
+const text=
+"INITIALIZING SYSTEM... LOADING MODULES... ACCESS GRANTED";
 let i=0;
 setInterval(()=>{
 type.textContent=text.slice(0,i);
 i++;
-if(i>text.length) i=0;
+
+if(i>text.length){
+i=0;
+}
 },90);
 </script>
 </body>
