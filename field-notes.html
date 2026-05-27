@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal Fieldbook</title>
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#020304;
+--panel:#090b0d;
+--panel2:#0d1013;
+--border:rgba(185,195,205,.16);
+--border2:rgba(80,130,180,.24);
+--title:#e6edf3;
+--text:#d5dde5;
+--muted:rgba(213,221,229,.52);
+--cmd:#8ff0a4;
+--prompt:#4ea1ff;
+--path:#9fb6c9;
+--warn:#ff6b6b;
+--amber:#d7a84f;
+--shadow:rgba(0,0,0,.55);
+}
+
+*{box-sizing:border-box;}
+
+body{
+margin:0;
+min-height:100vh;
+background:
+radial-gradient(circle at top,#111820 0%,#050607 48%,#000 100%);
+color:var(--text);
+font-family:'IBM Plex Mono', monospace;
+overflow-x:hidden;
+}
+
+.bg{
+position:fixed;
+inset:0;
+background-image:
+linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+background-size:52px 52px;
+animation:gridMove 24s linear infinite;
+z-index:-4;
+}
+
+@keyframes gridMove{
+from{transform:translateY(0);}
+to{transform:translateY(52px);}
+}
+
+.sweep{
+position:fixed;
+inset:-40%;
+background:linear-gradient(115deg, transparent 42%, rgba(80,130,180,.07), transparent 58%);
+animation:sweep 10s ease-in-out infinite;
+z-index:-3;
+}
+
+@keyframes sweep{
+0%{transform:translateX(-35%);}
+50%{transform:translateX(25%);}
+100%{transform:translateX(-35%);}
+}
+
+.scan{
+position:fixed;
+inset:0;
+background:linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%);
+background-size:100% 5px;
+opacity:.30;
+pointer-events:none;
+z-index:10;
+}
+
+.wrap{
+max-width:1240px;
+margin:0 auto;
+padding:18px;
+}
+
+.terminal{
+background:rgba(0,0,0,.86);
+border:1px solid var(--border);
+border-radius:10px;
+box-shadow:0 0 44px var(--shadow), inset 0 0 30px rgba(255,255,255,.018);
+overflow:hidden;
+}
+
+.topbar{
+height:36px;
+background:#080b0e;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 13px;
+font-size:12px;
+color:var(--muted);
+}
+
+.dots span{
+display:inline-block;
+width:9px;
+height:9px;
+border-radius:50%;
+margin-right:6px;
+background:#b9c3cd;
+opacity:.62;
+}
+
+.screen{padding:24px;}
+
+h1{
+margin:0;
+font-family:'Rajdhani', sans-serif;
+font-size:38px;
+font-weight:700;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(--title);
+}
+
+.sub{
+margin-top:7px;
+font-size:13px;
+color:var(--muted);
+}
+
+.rule{
+margin:18px 0 22px;
+padding:12px 14px;
+border:1px solid rgba(255,255,255,.09);
+background:rgba(255,255,255,.035);
+color:rgba(213,221,229,.64);
+font-size:12px;
+line-height:1.6;
+}
+
+.nav{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin:18px 0 22px;
+}
+
+.nav button,.bottom button{
+background:#050607;
+border:1px solid var(--border);
+color:var(--text);
+font-family:'IBM Plex Mono', monospace;
+padding:9px 11px;
+border-radius:7px;
+cursor:pointer;
+transition:.18s;
+}
+
+.nav button.active,
+.nav button:hover,
+.bottom button:hover{
+border-color:var(--border2);
+color:var(--prompt);
+background:rgba(78,161,255,.055);
+}
+
+.page{display:none;}
+.page.active{display:block;}
+
+.panel{
+background:linear-gradient(180deg,var(--panel),var(--panel2));
+border:1px solid var(--border);
+border-radius:8px;
+padding:16px;
+margin-bottom:16px;
+}
+
+.panel-title{
+font-family:'Rajdhani', sans-serif;
+font-size:19px;
+font-weight:700;
+letter-spacing:.8px;
+text-transform:uppercase;
+color:var(--title);
+margin-bottom:12px;
+padding-bottom:8px;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+pre{
+margin:0;
+white-space:pre-wrap;
+word-break:break-word;
+line-height:1.58;
+font-size:13px;
+}
+
+.prompt{color:var(--prompt);}
+.path{color:var(--path);}
+.cmd{color:var(--cmd);}
+.out{color:var(--muted);}
+.white{color:var(--title);}
+.warn{color:var(--warn);}
+.amber{color:var(--amber);}
+.note{color:rgba(213,221,229,.42);}
+
+.cols{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.bottom{
+display:flex;
+justify-content:space-between;
+gap:12px;
+margin-top:18px;
+}
+
+.footer{
+text-align:center;
+padding:22px;
+font-size:11px;
+letter-spacing:2px;
+color:rgba(213,221,229,.28);
+}
+
+@media(max-width:850px){
+.wrap{padding:8px;}
+.screen{padding:14px;}
+h1{font-size:28px;}
+pre{font-size:12px;}
+.cols{grid-template-columns:1fr;}
+.topbar{font-size:10px;}
+.nav button{font-size:11px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="sweep"></div>
+<div class="scan"></div>
+
+<div class="wrap">
+<div class="terminal">
+
+<div class="topbar">
+<div class="dots"><span></span><span></span><span></span></div>
+<div><span class="prompt">apeiron@kali</span>:<span class="path">~/fieldbook</span></div>
+<div>TTY-04</div>
+</div>
+
+<div class="screen">
+
+<h1>Terminal Fieldbook</h1>
+<div class="sub">Kali workflows / lab exploitation notes / authorized targets only</div>
+
+<div class="rule">
+Controlled environments only: owned VMs, CTF boxes, DVWA/Juice Shop, Metasploitable, lab hashes, and written authorization. No public targets. No stolen data.
+</div>
+
+<div class="nav">
+<button onclick="showPage(0)" class="active">01 Recon</button>
+<button onclick="showPage(1)">02 Web Surface</button>
+<button onclick="showPage(2)">03 Hash Audit</button>
+<button onclick="showPage(3)">04 Linux Enum</button>
+<button onclick="showPage(4)">05 PrivEsc</button>
+<button onclick="showPage(5)">06 Automation</button>
+</div>
+
+<!-- PAGE 01 -->
+<div class="page active">
+<div class="panel">
+<div class="panel-title">01 / Network Recon Chain</div>
+<pre><span class="prompt">apeiron@kali</span>:<span class="path">~</span>$ <span class="cmd">mkdir -p ops/target01/{scans,loot,notes}</span>
+<span class="prompt">apeiron@kali</span>:<span class="path">~</span>$ <span class="cmd">cd ops/target01</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">ip -brief address</span>
+<span class="out">lo               UNKNOWN        127.0.0.1/8
+eth0             UP             192.168.64.6/24</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">ip route</span>
+<span class="out">default via 192.168.64.1 dev eth0
+192.168.64.0/24 dev eth0 proto kernel scope link src 192.168.64.6</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">nmap -sn 192.168.64.0/24 -oN scans/00-hosts.txt</span>
+<span class="out">Nmap scan report for 192.168.64.1
+Host is up.
+Nmap scan report for 192.168.64.6
+Host is up.
+Nmap scan report for target.lab
+Host is up.</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">nmap -sV -sC target.lab -oN scans/01-basic.txt</span>
+<span class="out">PORT    STATE SERVICE VERSION
+22/tcp  open  ssh     OpenSSH
+80/tcp  open  http    Apache httpd
+445/tcp open  smb     Samba smbd</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">nmap -p- --min-rate 2500 target.lab -oN scans/02-fulltcp.txt</span>
+<span class="out">Discovered open port 22/tcp
+Discovered open port 80/tcp
+Discovered open port 445/tcp
+Discovered open port 8080/tcp</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">nmap -sV -sC -p 22,80,445,8080 target.lab -oN scans/03-deep.txt</span>
+<span class="note"># refine only confirmed ports, avoid wasting probes on dead space</span></pre>
+</div>
+
+<div class="cols">
+<div class="panel">
+<div class="panel-title">Scan Logic</div>
+<pre><span class="white">-sn</span>     host discovery
+<span class="white">-sV</span>     service version detection
+<span class="white">-sC</span>     default NSE scripts
+<span class="white">-p-</span>     all 65535 TCP ports
+<span class="white">-oN</span>     normal report output
+
+<span class="amber">sequence:</span>
+discover → basic scan → full TCP → deep service scan</pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Operator Read</div>
+<pre><span class="out">22/tcp</span>  remote access surface
+<span class="out">80/tcp</span>  web attack surface
+<span class="out">445/tcp</span> SMB enumeration surface
+<span class="out">8080</span>   alternate web/admin surface
+
+<span class="warn">Only continue against lab/owned targets.</span></pre>
+</div>
+</div>
+</div>
+
+<!-- PAGE 02 -->
+<div class="page">
+<div class="panel">
+<div class="panel-title">02 / Web Surface Mapping</div>
+<pre><span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">curl -I http://target.lab</span>
+<span class="out">HTTP/1.1 200 OK
+Server: Apache/2.4.x
+X-Powered-By: PHP/7.x
+Set-Cookie: PHPSESSID=lab-session</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">whatweb http://target.lab</span>
+<span class="out">Apache, PHP, Cookies, HTML5, Login-Page</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">mkdir -p scans/web</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">gobuster dir -u http://target.lab -w /usr/share/wordlists/dirb/common.txt -o scans/web/gobuster-common.txt</span>
+<span class="out">/admin               (Status: 301)
+/login               (Status: 200)
+/uploads             (Status: 200)
+/backup              (Status: 403)
+/server-status       (Status: 403)
+/robots.txt          (Status: 200)</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">ffuf -u http://target.lab/FUZZ -w /usr/share/wordlists/dirb/common.txt -mc 200,301,302,403 -o scans/web/ffuf.json</span>
+<span class="out">admin                  [Status: 301]
+uploads                [Status: 200]
+backup                 [Status: 403]
+dev                    [Status: 302]</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">curl http://target.lab/robots.txt</span>
+<span class="out">User-agent: *
+Disallow: /backup
+Disallow: /dev
+Disallow: /admin</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/ops/target01</span>$ <span class="cmd">nikto -h http://target.lab -o scans/web/nikto.txt</span>
+<span class="note"># misconfiguration sweep against controlled web target</span></pre>
+</div>
+
+<div class="cols">
+<div class="panel">
+<div class="panel-title">Web Targets</div>
+<pre><span class="cmd">/admin</span>        authentication surface
+<span class="cmd">/uploads</span>      file-handling surface
+<span class="cmd">/backup</span>       sensitive directory candidate
+<span class="cmd">/robots.txt</span>   hidden-path clue source
+<span class="cmd">/dev</span>          staging/dev leak candidate</pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Next Probes</div>
+<pre><span class="prompt">apeiron@kali</span>:<span class="path">~</span>$ <span class="cmd">curl -s http://target.lab/login | head</span>
+<span class="prompt">apeiron@kali</span>:<span class="path">~</span>$ <span class="cmd">grep -Ri "password" loot/ 2>/dev/null</span>
+<span class="prompt">apeiron@kali</span>:<span class="path">~</span>$ <span class="cmd">exiftool loot/* 2>/dev/null</span>
+<span class="note"># collect clues, do not attack public apps</span></pre>
+</div>
+</div>
+</div>
+
+<!-- PAGE 03 -->
+<div class="page">
+<div class="panel">
+<div class="panel-title">03 / Password Audit Lab</div>
+<pre><span class="prompt">apeiron@kali</span>:<span class="path">~/hash-lab</span>$ <span class="cmd">cat sample_hashes.txt</span>
+<span class="out">5f4dcc3b5aa765d61d8327deb882cf99
+098f6bcd4621d373cade4e832627b4f6
+25d55ad283aa400af464c76d713c07ad</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/hash-lab</span>$ <span class="cmd">hashid sample_hashes.txt</span>
+<span class="out">[+] Possible Hashs: MD5</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/hash-lab</span>$ <span class="cmd">john --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt sample_hashes.txt</span>
+<span class="out">Loaded 3 password hashes
+password         (?)
+test             (?)
+12345678         (?)</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/hash-lab</span>$ <span class="cmd">john --show --format=raw-md5 sample_hashes.txt</span>
+<span class="out">?:password
+?:test
+?:12345678
+3 password hashes cracked</span>
+
+<span class="prompt">apeiron@kali</span>:<span class="path">~/hash-lab</span>$ <span class="cmd">hashcat -m 0 sample_hashes.txt /usr/share/wordlists/rockyou.txt --status</span>
+<span class="out">Session..........: hashcat
+Status...........: Cracked
+Hash.Mode........: 0 (MD5)
+Recovered........: 3/3</span></pre>
+</div>
+
+<div class="cols">
+<div class="panel">
+<div class="panel-title">Cracking Logic</div>
+<pre><span class="white">1.</span> identify hash type
+<span class="white">2.</span> choose correct mode
+<span class="white">3.</span> run controlled wordlist audit
+<span class="white">4.</span> record weak patterns
+<span class="white">5.</span> recommend stronger password policy
+
+<span class="warn">Do not use stolen/leaked hashes.</span></pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Hashcat Modes</div>
+<pre><span class="cmd">-m 0</span>       MD5
+<span class="cmd">-m 100</span>     SHA1
+<span class="cmd">-m 1000</span>    NTLM
+<span class="cmd">-m 1400</span>    SHA2-256
+<span class="cmd">-a 0</span>       straight attack
+<span class="cmd">--status</span>  live progress</pre>
+</div>
+</div>
+</div>
+
+<!-- PAGE 04 -->
+<div class="page">
+<div class="panel">
+<div class="panel-title">04 / Linux Enumeration After Foothold</div>
+<pre><span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">whoami && id</span>
+<span class="out">www-data
+uid=33(www-data) gid=33(www-data) groups=33(www-data)</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">hostname && uname -a</span>
+<span class="out">target
+Linux target 5.x.x x86_64 GNU/Linux</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">ip a && ip route</span>
+<span class="out">eth0: 192.168.56.110/24
+default via 192.168.56.1</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">ss -tulnp 2>/dev/null</span>
+<span class="out">tcp LISTEN 0 128 0.0.0.0:22
+tcp LISTEN 0 128 0.0.0.0:80
+tcp LISTEN 0 80 127.0.0.1:3306</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">find /var/www -type f -name "*.php" 2>/dev/null | head</span>
+<span class="out">/var/www/html/config.php
+/var/www/html/login.php
+/var/www/html/upload.php</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/var/www/html</span>$ <span class="cmd">grep -Ri "password\|passwd\|db_" /var/www 2>/dev/null</span>
+<span class="out">/var/www/html/config.php:$db_pass='lab-password';</span></pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Enumeration Questions</div>
+<pre><span class="white">user:</span> who am I?
+<span class="white">groups:</span> what permissions do I inherit?
+<span class="white">kernel:</span> old/vulnerable?
+<span class="white">network:</span> internal-only services?
+<span class="white">webroot:</span> credentials or configs?
+<span class="white">sudo:</span> allowed commands?
+<span class="white">files:</span> writable paths?</pre>
+</div>
+</div>
+
+<!-- PAGE 05 -->
+<div class="page">
+<div class="panel">
+<div class="panel-title">05 / Privilege Escalation Vector Checks</div>
+<pre><span class="prompt">www-data@target</span>:<span class="path">/tmp</span>$ <span class="cmd">sudo -l</span>
+<span class="out">Sorry, user www-data may not run sudo on target.</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/tmp</span>$ <span class="cmd">find / -perm -4000 -type f 2>/dev/null</span>
+<span class="out">/usr/bin/passwd
+/usr/bin/sudo
+/usr/bin/find
+/usr/bin/bash</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/tmp</span>$ <span class="cmd">find / -writable -type d 2>/dev/null | head</span>
+<span class="out">/tmp
+/var/tmp
+/dev/shm
+/opt/scripts</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/tmp</span>$ <span class="cmd">cat /etc/crontab</span>
+<span class="out">* * * * * root /opt/scripts/backup.sh</span>
+
+<span class="prompt">www-data@target</span>:<span class="path">/tmp</span>$ <span class="cmd">ls -la /opt/scripts/backup.sh</span>
+<span class="out">-rwxrwxrwx 1 root root 124 May 18 04:00 backup.sh</span>
+
+<span class="note"># lab interpretation: writable root-executed script is an escalation candidate</span></pre>
+</div>
+
+<div class="cols">
+<div class="panel">
+<div class="panel-title">Vector Order</div>
+<pre><span class="cmd">sudo -l</span>
+<span class="cmd">SUID binaries</span>
+<span class="cmd">cron jobs</span>
+<span class="cmd">writable root scripts</span>
+<span class="cmd">credentials in configs</span>
+<span class="cmd">PATH hijack checks</span>
+<span class="cmd">internal services</span>
+<span class="cmd">kernel research</span></pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Do Not Publish</div>
+<pre><span class="warn">real credentials
+real private IPs
+private tokens
+real client data
+working abuse scripts
+unauthorized target details</span></pre>
+</div>
+</div>
+</div>
+
+<!-- PAGE 06 -->
+<div class="page">
+<div class="panel">
+<div class="panel-title">06 / Recon Automation Skeleton</div>
+<pre><span class="cmd">#!/bin/bash
+
+TARGET=$1
+BASE="ops/$TARGET"
+SCANS="$BASE/scans"
+NOTES="$BASE/notes"
+
+if [ -z "$TARGET" ]; then
+  echo "usage: ./recon-chain.sh target.lab"
+  exit 1
+fi
+
+mkdir -p "$SCANS" "$NOTES"
+
+echo "[+] target: $TARGET"
+echo "[+] workspace: $BASE"
+
+nmap -sV -sC "$TARGET" -oN "$SCANS/basic.txt"
+nmap -p- --min-rate 2500 "$TARGET" -oN "$SCANS/full_tcp.txt"
+
+PORTS=$(grep "/tcp" "$SCANS/full_tcp.txt" | awk -F/ '{print $1}' | paste -sd, -)
+
+if [ -n "$PORTS" ]; then
+  echo "[+] exposed ports: $PORTS"
+  nmap -sV -sC -p "$PORTS" "$TARGET" -oN "$SCANS/deep.txt"
+fi
+
+{
+echo "# TARGET: $TARGET"
+echo "# DATE: $(date)"
+echo ""
+echo "## FILES"
+ls -la "$SCANS"
+} > "$NOTES/summary.md"
+
+echo "[+] complete"</span></pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Run Log</div>
+<pre><span class="prompt">apeiron@kali</span>:<span class="path">~/tools</span>$ <span class="cmd">chmod +x recon-chain.sh</span>
+<span class="prompt">apeiron@kali</span>:<span class="path">~/tools</span>$ <span class="cmd">./recon-chain.sh target.lab</span>
+<span class="out">[+] target: target.lab
+[+] workspace: ops/target.lab
+[+] exposed ports: 22,80,445,8080
+[+] complete</span></pre>
+</div>
+
+<div class="panel">
+<div class="panel-title">Purpose</div>
+<pre>This script organizes lab recon artifacts.
+It does not exploit targets.
+It creates repeatable scan folders, output files, and notes for authorized environments.</pre>
+</div>
+</div>
+
+<div class="bottom">
+<button onclick="prevPage()">← previous</button>
+<button onclick="nextPage()">next →</button>
+</div>
+
+</div>
+
+<div class="footer">TERMINAL FIELDBOOK // CONTROLLED OFFENSIVE LAB NOTES</div>
+
+</div>
+</div>
+
+<script>
+let currentPage = 0;
+const pages = document.querySelectorAll('.page');
+const buttons = document.querySelectorAll('.nav button');
+
+function showPage(index){
+currentPage = index;
+pages.forEach(p => p.classList.remove('active'));
+buttons.forEach(b => b.classList.remove('active'));
+pages[index].classList.add('active');
+buttons[index].classList.add('active');
+window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function nextPage(){
+currentPage = (currentPage + 1) % pages.length;
+showPage(currentPage);
+}
+
+function prevPage(){
+currentPage = (currentPage - 1 + pages.length) % pages.length;
+showPage(currentPage);
+}
+</script>
+
+</body>
+</html>
